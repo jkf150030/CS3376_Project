@@ -33,7 +33,7 @@ void error(const char *msg)
 	exit(1);
 }
 
-void procTransT(int socket, logMessage &message)
+void procTransT(int socket, logMessage &message, char **argv, int argc)
 {
 	int n;
 	struct logMessage logMsg;
@@ -55,7 +55,7 @@ void procTransT(int socket, logMessage &message)
 	bcopy((char *)buffer, (char *)logMsg.message, sizeof(buffer) - 1);
 	
 	//Call the log_s.
-	callLogServer(logMsg);
+	callLogServer(logMsg, argv, argc);
 	
 	//Write the response to the client.
 	n = write(socket, buffer, sizeof(buffer));
@@ -80,12 +80,12 @@ int setupSocket(int type, sockaddr_in &serv_addr, int port_no)
 	return sockfd;
 }
 
-int callLogServer(logMessage &message)
+int callLogServer(logMessage &message, char **argv, int argc)
 {
 	int sockfd, n;
 	unsigned int length;
 	struct sockaddr_in serv_addr, serv_resp;
-	struct hostent *server;
+	//struct hostent *server;
 	char buffer[1024];
 	
 	//Create the socket.
@@ -94,9 +94,7 @@ int callLogServer(logMessage &message)
 	
 	//Set the address family, server IP, and port number.
 	serv_addr.sin_family = AF_INET;
-	server = gethostbyname("localhost");
-	if(server == 0) error("ERROR, no such host ");
-	bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr, server->h_length);
+	serv_addr.sin_addr.s_addr = inet_addr(argv[argc - 2]);
 	serv_addr.sin_port = htons(9999);
 	length = sizeof(struct sockaddr_in);
 	

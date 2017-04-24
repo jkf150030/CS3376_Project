@@ -34,8 +34,8 @@ int main(int argc, char *argv[])
 	char buffer[1024];
 	
 	//Error if too few or too many port numbers provided.
-	if(argc < 2 || argc > 4) {
-		fprintf(stderr, "Usage: %s <port1> [<port2> <port3>]\n", argv[0]);
+	if(argc < 4 || argc > 6) {
+		fprintf(stderr, "Usage: %s <port1> [<port2> <port3>] -logip <log_serv_address>\n", argv[0]);
 		exit(0);
 	}
 	
@@ -44,18 +44,18 @@ int main(int argc, char *argv[])
 	//Set signal for waitpid - handles zombie processes.
 	signal(SIGCHLD, sigCatcher);
 	
-	for(int i = 0; i < argc - 1; i++) {
+	for(int i = 0; i < argc - 3; i++) {
 		/**********    This section creates the TCP socket.    **********/
 		//Set serv_addr to all zeros.
 		bzero((char *) &serv_addr, sizeof(serv_addr));
 		
 		//Create the TCP socket.
 		tcpfd[i] = setupSocket(SOCK_STREAM, serv_addr, atoi(argv[i]));
-		if(tcpfd[i] < 0) error(strncat((char *) "ERROR opening socket on port ", argv[i], 35));
+		if(tcpfd[i] < 0) error(strncat((char *) "ERROR opening TCP socket on port ", argv[i], 35));
 		
 		//Bind the TCP socket to the address.
 		if(bind(tcpfd[i], (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
-			error("ERROR on binding ");
+			error("ERROR on binding TCP ");
 		
 		//Listen on the socket for connections.
 		listen(tcpfd[i], 5);
@@ -66,11 +66,11 @@ int main(int argc, char *argv[])
 		
 		//Create the UDP socket.
 		udpfd[i] = setupSocket(SOCK_DGRAM, serv_addr, atoi(argv[i]));
-		if(udpfd[i] < 0) error(strncat((char *) "ERROR opening socket on port ", argv[i], 35));
+		if(udpfd[i] < 0) error(strncat((char *) "ERROR opening UDP socket on port ", argv[i], 35));
 		
 		//Bind the UDP socket to the address.
 		if(bind(udpfd[i], (struct sockaddr *)&serv_addr, sizeof(serv_addr))<0)
-			error("ERROR on binding ");
+			error("ERROR on binding UDP ");
 		/****************************************************************/
 	}
 	
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 	//Loop infinitely to handle connections.
 	while(1) {
 		//Add both file descriptors to the set.
-		for(int i = 0; i < argc - 1; i++) {
+		for(int i = 0; i < argc - 3; i++) {
 			FD_SET(tcpfd[i], &rset);
 			FD_SET(udpfd[i], &rset);
 			
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 		}
 		
 		int tfd, ufd;
-		for (int i = 0; i < argc - 1; i++) {
+		for (int i = 0; i < argc - 3; i++) {
 			if(FD_ISSET(tcpfd[i], &rset)) {
 				tfd = tcpfd[i];
 				break;
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
 				//Get the client address.
 				message.address = cli_addr.sin_addr.s_addr;
 				
-				procTransT(newtcpfd, message);
+				procTransT(newtcpfd, message, argv, argc);
 				exit(0);
 			}
 			
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
 			bcopy((char *)buffer, (char *)message.message, sizeof(buffer) - 1);
 			
 			//Call the log_s.
-			callLogServer(message);
+			callLogServer(message, argv, argc);
 			
 			//Write the response to the client.
 			n = sendto(ufd, buffer, sizeof(buffer), 0, (struct sockaddr *)&cli_addr, clilen);

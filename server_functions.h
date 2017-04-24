@@ -27,11 +27,11 @@ struct logMessage
 
 
 void error(const char *);
-void procTransT(int, logMessage &);
+void procTransT(int, logMessage &, char **, int);
 void sigCatcher(int);
 int setupSocket(int, sockaddr_in &, int);
 int appendLog(logMessage &);
-int callLogServer(logMessage &);
+int callLogServer(logMessage &, char **, int);
 void cleanExit(int);
 
 #endif
