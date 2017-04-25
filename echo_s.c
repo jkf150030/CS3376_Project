@@ -34,8 +34,8 @@ int main(int argc, char *argv[])
 	char buffer[1024];
 	
 	//Error if too few or too many port numbers provided.
-	if(argc < 4 || argc > 6) {
-		fprintf(stderr, "Usage: %s <port1> [<port2> <port3>] -logip <log_serv_address>\n", argv[0]);
+	if(argc < 6 || argc > 8) {
+		fprintf(stderr, "Usage: %s <port1> [<port2> <port3>] -logip <log_serv_address> -logport <log_port_address>\n", argv[0]);
 		exit(0);
 	}
 	
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 	//Set signal for waitpid - handles zombie processes.
 	signal(SIGCHLD, sigCatcher);
 	
-	for(int i = 0; i < argc - 3; i++) {
+	for(int i = 0; i < argc - 5; i++) {
 		/**********    This section creates the TCP socket.    **********/
 		//Set serv_addr to all zeros.
 		bzero((char *) &serv_addr, sizeof(serv_addr));
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 	//Loop infinitely to handle connections.
 	while(1) {
 		//Add both file descriptors to the set.
-		for(int i = 0; i < argc - 3; i++) {
+		for(int i = 0; i < argc -5; i++) {
 			FD_SET(tcpfd[i], &rset);
 			FD_SET(udpfd[i], &rset);
 			
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 		}
 		
 		int tfd, ufd;
-		for (int i = 0; i < argc - 3; i++) {
+		for (int i = 0; i < argc - 5; i++) {
 			if(FD_ISSET(tcpfd[i], &rset)) {
 				tfd = tcpfd[i];
 				break;

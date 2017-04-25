@@ -26,7 +26,6 @@
 #include <signal.h>
 #include "server_functions.h"
 
-
 void error(const char *msg)
 {
 	perror(msg);
@@ -91,11 +90,11 @@ int callLogServer(logMessage &message, char **argv, int argc)
 	//Create the socket.
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	if(sockfd < 0) error("ERROR opening socket ");
-	
+
 	//Set the address family, server IP, and port number.
 	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = inet_addr(argv[argc - 2]);
-	serv_addr.sin_port = htons(9999);
+	serv_addr.sin_addr.s_addr = inet_addr(argv[argc - 4]);
+	serv_addr.sin_port = htons(atoi(argv[argc - 1]));
 	length = sizeof(struct sockaddr_in);
 	
 	//Write the information to the server.

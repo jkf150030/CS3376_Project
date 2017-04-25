@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 	bzero(&serv_addr, sizeof(serv_addr));
 	
 	//Create the socket.
-	udpfd = setupSocket(SOCK_DGRAM, serv_addr, 9999);
+	udpfd = setupSocket(SOCK_DGRAM, serv_addr, atoi(argv[argc-1]) );
 	if(udpfd < 0) error("ERROR opening socket ");
 	
 	//Bind the socket to the address.
