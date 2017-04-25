@@ -25,6 +25,20 @@ int main(int argc, char *argv[])
 	struct sockaddr_in serv_addr, cli_addr;
 	struct logMessage logMsg;
 	
+	//Error if no port number provided or if too many args.
+	if(argc < 3 || argc > 3) {
+		fprintf(stderr, "Usage: %s -port port \n", argv[0]);
+		exit(0);
+	}
+	
+	//If four args, see if argv[1] is -port
+	if(argc == 4) {
+		if(strcmp(argv[1], "-port") != 0) {
+			fprintf(stderr, "Usage: %s -port port\n", argv[0]);
+			exit(0);
+		}
+	}
+	
 	//Set serv_addr to all zeros.
 	bzero(&serv_addr, sizeof(serv_addr));
 	

@@ -23,8 +23,8 @@
 
 int main(int argc, char *argv[])
 {
-	int tcpfd[argc - 1];
-	int udpfd[argc - 1];
+	int tcpfd[argc - 5];
+	int udpfd[argc - 5];
 	int newtcpfd, nready, maxfdp1;
 	pid_t childpid;
 	fd_set rset;
