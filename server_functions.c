@@ -91,10 +91,12 @@ int callLogServer(logMessage &message, char **argv, int argc)
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	if(sockfd < 0) error("ERROR opening socket ");
 
+	printf("%i\n", atoi(argv[argc-2]));
+
 	//Set the address family, server IP, and port number.
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = inet_addr(argv[argc - 4]);
-	serv_addr.sin_port = htons(atoi(argv[argc - 1]));
+	serv_addr.sin_port = htons(atoi(argv[argc-2]));
 	length = sizeof(struct sockaddr_in);
 	
 	//Write the information to the server.
