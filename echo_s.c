@@ -1,7 +1,8 @@
 // File: echo_s.c
 // Contributors:
 //    James Fritz       jkf150030
-//    Chase Vriezema    cmv140030
+//    Chase Vriezema    cmv14003
+//    Duc Nguyen	dqn150030
 // Date: 04/23/2017
 // Purpose: CS3376
 // Description:
