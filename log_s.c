@@ -17,7 +17,9 @@
 #include <stdio.h>
 #include "server_functions.h"
 
-
+void writesignal(char msg[1024]){
+  
+}
 int main(int argc, char *argv[])
 {
 	int udpfd, n;
@@ -75,7 +77,14 @@ int main(int argc, char *argv[])
 		if(strcmp(echoStop,logMsg.message) == 0)
 		{
 			n = sendto(udpfd, "Log_s is stopping.", 18, 0, (struct sockaddr *)&cli_addr, clilen);
-			if(n < 0) error("ERROR sending to socket ");
+
+		        FILE *logFile = fopen("echo.log", "a");
+                        if(logFile == NULL) error("Error opening file ");
+                        else {
+                          fprintf(logFile, "echo_s is stopping");
+                        }
+                        fclose(logFile);
+                        if(n < 0) error("ERROR sending to socket ");
 			exit(0);
 		}
 		else
