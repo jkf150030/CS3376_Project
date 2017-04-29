@@ -90,6 +90,7 @@ int callLogServer(logMessage &message, char **argv, int argc)
 	//Create the socket.
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	if(sockfd < 0) error("ERROR opening socket ");
+	
 
 	printf("%i\n", atoi(argv[argc-2]));
 
@@ -108,6 +109,7 @@ int callLogServer(logMessage &message, char **argv, int argc)
 	
 	//Read the reply from the server.
 	n = recvfrom(sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&serv_resp, &length);
+	printf("%i %s\n",n,buffer);
 	if(n < 0) error("ERROR receiving from socket ");
 	
 	//Print the reply from the server.

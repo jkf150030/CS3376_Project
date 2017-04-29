@@ -1,7 +1,7 @@
 // File: echo_s.c
 // Contributors:
 //    James Fritz       jkf150030
-//    Chase Vriezema    cmv14003
+//    Chase Vriezema    cmv140030
 //    Duc Nguyen	dqn150030
 // Date: 04/23/2017
 // Purpose: CS3376
@@ -21,6 +21,21 @@
 #include "server_functions.h"
 
 
+//global variables
+int g_argc;
+char **g_argv;
+int32_t g_address;
+
+void signalCatch(int sig_num)
+{
+	struct logMessage msg;
+	char buffer[1024] =  "echo_s is stopping";
+	bcopy((char *)buffer, (char *)msg.message, sizeof(buffer) - 1);
+	msg.address = g_address;
+	callLogServer(msg, g_argv, g_argc);
+	_exit(0);
+}
+
 int main(int argc, char *argv[])
 {
 	int tcpfd[argc - 5];
@@ -34,6 +49,8 @@ int main(int argc, char *argv[])
 	struct logMessage message;
 	char buffer[1024];
 	
+
+
 	//Error if too few or too many port numbers provided.
 	if(argc < 6 || argc > 8) {
 		fprintf(stderr, "Usage: %s <port1> [<port2> <port3>] -logip <log_serv_address> -logport <log_port_address>\n", argv[0]);
@@ -44,7 +61,7 @@ int main(int argc, char *argv[])
 	
 	//Set signal for waitpid - handles zombie processes.
 	signal(SIGCHLD, sigCatcher);
-	
+
 	for(int i = 0; i < argc - 5; i++) {
 		/**********    This section creates the TCP socket.    **********/
 		//Set serv_addr to all zeros.
@@ -81,6 +98,11 @@ int main(int argc, char *argv[])
 	//Add one to the larger of the two file descriptors.
 	maxfdp1 = -1;
 	
+	//sets the sigint handle to the function sigintHandler
+	g_argc = argc;
+	g_argv = argv;
+	signal(SIGINT, signalCatch);
+
 	//Loop infinitely to handle connections.
 	while(1) {
 		//Add both file descriptors to the set.
@@ -156,7 +178,10 @@ int main(int argc, char *argv[])
 			//Create the logMessage struct.
 			message.address = cli_addr.sin_addr.s_addr;
 			bcopy((char *)buffer, (char *)message.message, sizeof(buffer) - 1);
-			
+			//set g_address equal to adress
+			g_address = message.address;
+
+
 			//Call the log_s.
 			callLogServer(message, argv, argc);
 			
@@ -166,5 +191,5 @@ int main(int argc, char *argv[])
 		}
 	}
 	
-	return 0;
+	return 0;	
 }
