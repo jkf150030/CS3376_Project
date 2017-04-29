@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
 	socklen_t clilen;
 	struct sockaddr_in serv_addr, cli_addr;
 	struct logMessage logMsg;
+	char echoStop[1024] = "echo_s is stopping"; 
 	
 	//Error if no port number provided or if too many args.
 	if(argc < 3 || argc > 3) {
@@ -58,10 +59,10 @@ int main(int argc, char *argv[])
 		//Set message to all zeros.
 		bzero(&logMsg, sizeof(struct logMessage));
 		
-		//Receive the information from the client.
+		//Receive the information from the client
 		n = recvfrom(udpfd, &logMsg, sizeof(struct logMessage), 0, (struct sockaddr *)&cli_addr, &clilen);
 		if(n < 0) error("ERROR receiving from socket ");
-		
+
 		//Convert the given time to a tm struct.
 		struct tm * now = localtime(&logMsg.dateTime);
 		
@@ -70,27 +71,43 @@ int main(int argc, char *argv[])
 			if(logMsg.message[i] == 10) logMsg.message[i] = 0;
 		}
 		
-		//Print the message.
-		printf(
-			"Logging: %.4d-%.2d-%.2d %.2d:%.2d:%.2d	\"%s\" was received from %d.%d.%d.%d\n",
-			(now->tm_year + 1900),
-			(now->tm_mon + 1),
-			now->tm_mday,
-			now->tm_hour,
-			now->tm_min,
-			now->tm_sec,
-			logMsg.message,
-			int(logMsg.address&0xFF),
-			int((logMsg.address&0xFF00)>>8),
-			int((logMsg.address&0xFF0000)>>16),
-			int((logMsg.address&0xFF000000)>>24));
+		//if the message from echo_s is "echo is stopping" then terminate
+		if(strcmp(echoStop,logMsg.message) == 0)
+		{
+			n = sendto(udpfd, "Log_s is stopping.", 18, 0, (struct sockaddr *)&cli_addr, clilen);
+			if(n < 0) error("ERROR sending to socket ");
+			exit(0);
+		}
+		else
+		{
+			//print the message
+			 printf("Logging: %.4d-%.2d-%.2d %.2d:%.2d:%.2d \"%s\" was received from %d.%d.%d.%d",
+			 (now->tm_year + 1900), 
+			 (now->tm_mon + 1),
+			 now->tm_mday,
+			 now->tm_hour,
+			 now->tm_min,
+			 now->tm_sec,
+			 logMsg.message,
+			 int(logMsg.address&0xFF),
+			 int((logMsg.address&0xFF00)>>8),
+			 int((logMsg.address&0xFF0000)>>16),
+			 int((logMsg.address&0xFF000000)>>24));
+
+			//Write to the log file.
+			appendLog(logMsg);
 		
-		//Write to the log file.
+			//Write the response to the client.
+			n = sendto(udpfd, "Log file updated.", 17, 0, (struct sockaddr *)&cli_addr, clilen);
+			if(n < 0) error("ERROR sending to socket ");
+		}
+		/*
 		appendLog(logMsg);
-		
-		//Write the response to the client.
 		n = sendto(udpfd, "Log file updated.", 17, 0, (struct sockaddr *)&cli_addr, clilen);
-		if(n < 0) error("ERROR sending to socket ");
+		if(n < 0) error("ERROR sending to socket ");*/
+
+
+
 	}
 	
 	return 0;
