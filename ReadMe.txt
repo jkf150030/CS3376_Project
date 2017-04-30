@@ -1,12 +1,12 @@
 Project 3rd Deliverable - ReadMe.txt
 
 Members
-	James Fritz		jkf150030
-	Duc Nguyen		dqn150030
-	Luke Pettinger	flp081000
-	Kevin Shah		kjs160330
-	Brennan Stuewe	brs140230
-	Chase Vriezema	cmv140030
+	User1: James Fritz	jkf150030
+	User2: Duc Nguyen	dqn150030
+	User3: Luke Pettinger	flp081000
+	User4: Kevin Shah	kjs160330
+	User5: Brennan Stuewe	brs140230
+	User6: Chase Vriezema	cmv140030
 
 File List
 	Makefile
@@ -43,3 +43,11 @@ How To Run
 		server. The '-u' or '-udp' options switch the client to UDP connection
 		mode. The address for the server and the port number on the server are
 		both required for the client to start.
+
+User Tasks
+	James: Completed the user1-feature branch, editing server_functions.c, server_functions.h, echo_s.c
+	Duq: Completed the user_2-feature branch, editing echo_s.c, log_s.c, server_functions.c
+	Luke: Completed the user_3-feature branch, editing echo_s.c, server_functions.c, log_s.c
+	Kevin: Completed the user4-feature branch, editing server_functions.c, log_s.c, echo_s.c
+	Brennan: Completed the user5-feature branch, editing log_s.c
+	Chase: Completed the user6-feature branch, editing Readme.txt
