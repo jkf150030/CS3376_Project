@@ -30,9 +30,20 @@ void signalCatch(int sig_num)
 {
 	struct logMessage msg;
 	char buffer[1024] =  "echo_s is stopping";
+	
+	//Record the time of the call.
+	msg.dateTime = time(0);
+	
+	//Copy the stop message to the logMessage.
 	bcopy((char *)buffer, (char *)msg.message, sizeof(buffer) - 1);
+	
+	//Store the client address.
 	msg.address = g_address;
+	
+	//Call the log_s.
 	callLogServer(msg, g_argv, g_argc);
+	
+	//Exit.
 	_exit(0);
 }
 
@@ -49,8 +60,7 @@ int main(int argc, char *argv[])
 	struct logMessage message;
 	char buffer[1024];
 	
-
-
+	
 	//Error if too few or too many port numbers provided.
 	if(argc < 6 || argc > 8) {
 		fprintf(stderr, "Usage: %s <port1> [<port2> <port3>] -logip <log_serv_address> -logport <log_port_address>\n", argv[0]);
@@ -178,10 +188,10 @@ int main(int argc, char *argv[])
 			//Create the logMessage struct.
 			message.address = cli_addr.sin_addr.s_addr;
 			bcopy((char *)buffer, (char *)message.message, sizeof(buffer) - 1);
-			//set g_address equal to adress
+			
+			//Set g_address equal to message.address.
 			g_address = message.address;
-
-
+			
 			//Call the log_s.
 			callLogServer(message, argv, argc);
 			
