@@ -17,9 +17,7 @@
 #include <stdio.h>
 #include "server_functions.h"
 
-void writesignal(char msg[1024]){
-  
-}
+
 int main(int argc, char *argv[])
 {
 	int udpfd, n;
@@ -58,7 +56,7 @@ int main(int argc, char *argv[])
 	
 	//Loop infinitely to receive connections.
 	while(1) {
-		//Set message to all zeros.
+		//Set logMsg to all zeros.
 		bzero(&logMsg, sizeof(struct logMessage));
 		
 		//Receive the information from the client
@@ -73,24 +71,22 @@ int main(int argc, char *argv[])
 			if(logMsg.message[i] == 10) logMsg.message[i] = 0;
 		}
 		
-		//if the message from echo_s is "echo is stopping" then terminate
-		if(strcmp(echoStop,logMsg.message) == 0)
+		//If the message from echo_s is "echo is stopping" then terminate.
+		if(strcmp(echoStop, logMsg.message) == 0)
 		{
 			n = sendto(udpfd, "Log_s is stopping.", 18, 0, (struct sockaddr *)&cli_addr, clilen);
-
-		        FILE *logFile = fopen("echo.log", "a");
-                        if(logFile == NULL) error("Error opening file ");
-                        else {
-                          fprintf(logFile, "echo_s is stopping");
-                        }
-                        fclose(logFile);
-                        if(n < 0) error("ERROR sending to socket ");
+			if(n < 0) error("ERROR sending to socket ");
+			
+			//Write to the log file.
+			appendLog(logMsg);
+			
+			//
 			exit(0);
 		}
 		else
 		{
-			//print the message
-			 printf("Logging: %.4d-%.2d-%.2d %.2d:%.2d:%.2d \"%s\" was received from %d.%d.%d.%d",
+			//Print the message (not required).
+			 printf("Logging: %.4d-%.2d-%.2d %.2d:%.2d:%.2d \"%s\" was received from %d.%d.%d.%d\n",
 			 (now->tm_year + 1900), 
 			 (now->tm_mon + 1),
 			 now->tm_mday,
@@ -110,13 +106,6 @@ int main(int argc, char *argv[])
 			n = sendto(udpfd, "Log file updated.", 17, 0, (struct sockaddr *)&cli_addr, clilen);
 			if(n < 0) error("ERROR sending to socket ");
 		}
-		/*
-		appendLog(logMsg);
-		n = sendto(udpfd, "Log file updated.", 17, 0, (struct sockaddr *)&cli_addr, clilen);
-		if(n < 0) error("ERROR sending to socket ");*/
-
-
-
 	}
 	
 	return 0;
